@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Create User
-      run: sudo useradd -m root && sudo adduser root sudo && echo 'root:root' | sudo chpasswd
+      run: sudo useradd -m dmaxbg && sudo adduser dmaxbg sudo && echo 'dmaxbg:dmaxbg' | sudo passwd@1
     - name: Download & Install files
       run: | 
         echo Update: APT
