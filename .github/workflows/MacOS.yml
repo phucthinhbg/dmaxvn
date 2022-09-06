@@ -45,11 +45,11 @@ jobs:
         mode: ngrok
       env:
         # You can find this token here: https://dashboard.ngrok.com/auth/your-authtoken
-        NGROK_TOKEN: ${{ 2EMNJOfZG8kW337aspR2GyopfTn_2VSWamc9Qi2xdB7ThsbDS }}
+        NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
         # ngrok server region [us, eu, au, ap, sa, jp, in] (optional, default: us)
         NGROK_REGION: us
         # This password you will use when authorizing via SSH
-        SSH_PASSWORD: ${{ passwd@1 }}
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
         # Send connection info to Telegram (optional)
         TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
