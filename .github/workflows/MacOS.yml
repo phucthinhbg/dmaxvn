@@ -1,24 +1,42 @@
-name: MacOS 
-on: 
+name: MacOS SSH to GitHub Actions
+
+on:
   workflow_dispatch:
-defaults:
-  run:
-    shell: bash
 
 jobs:
-  build:
-    name: MacOS Build
-    runs-on: macos-latest
+  ssh:
+    runs-on: macos-10.15
+
     steps:
-    - uses: actions/checkout@v2
-    - name: Setting Up the MacOS Environment
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: SSH Keepalive Hack
+      run: |
+        mkdir -p ~/.ssh
+        cat << EOF > ~/.ssh/config
+        Host *
+            ServerAliveInterval 60
+            StrictHostKeyChecking no
+        Host github.com
+            User git
+            Port 22
+            Hostname github.com
+            TCPKeepAlive yes
+            IdentitiesOnly yes
+        EOF
+    - name: Start SSH via ngrok
+      continue-on-error: true
+      timeout-minutes: 350
+      uses: P3TERX/ssh2actions@main
+      with:
+        mode: ngrok
       env:
-        NGROK_AUTH_TOKEN: ${{ secrets.NGROK_AUTH_TOKEN }}
-        MAC_USER_PASSWORD: ${{ secrets.MAC_USER_PASSWORD }}
-        VNC_PASSWORD: ${{ secrets.VNC_PASSWORD }}
-        MAC_REALNAME: ${{ secrets.MAC_REALNAME }}
-      run: source macos.sh "$MAC_USER_PASSWORD" "$VNC_PASSWORD" "$NGROK_AUTH_TOKEN" "$MAC_REALNAME"
-    - name: Connecting MacOS with Ngrok to VNC Server
-      run: curl --silent http://127.0.0.1:4040/api/tunnels | jq '.tunnels[0].public_url'
-    - name: Keep Running MacOS System and keepAlive
-      uses: mxschmitt/action-tmate@v2
+        # You can find this token here: https://dashboard.ngrok.com/auth/your-authtoken
+        NGROK_TOKEN: ${{ secrets.NGROK_TOKEN }}
+        # ngrok server region [us, eu, au, ap, sa, jp, in] (optional, default: us)
+        NGROK_REGION: us
+        # This password you will use when authorizing via SSH
+        SSH_PASSWORD: ${{ secrets.SSH_PASSWORD }}
+        # Send connection info to Telegram (optional)
+        #TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        #TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
